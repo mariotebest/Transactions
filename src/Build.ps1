@@ -48,11 +48,13 @@ function Exec
     }
 }
 
+gci | Write-Verbose
+
 if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
 
 EnsurePsbuildInstalled
 
-gci | Write-Verbose -Verbose
+
 
 exec { & dotnet restore .\src }
 exec { & dotnet build .\src -c Release }
