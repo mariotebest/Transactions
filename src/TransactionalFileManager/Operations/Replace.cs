@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using TxFileManager.Utils;
+using TransactionalFileManager.Utils;
 
-namespace TxFileManager.Operations
+namespace TransactionalFileManager.Operations
 {
     /// <summary>
     /// Rollbackable operation which moves a file to a new location.

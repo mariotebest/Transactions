@@ -6,6 +6,7 @@ using System.Threading;
 using System.Transactions;
 using System.Xml;
 using NUnit.Framework;
+using TransactionalFileManager;
 
 namespace TxFileManager.Tests
 {
@@ -16,7 +17,7 @@ namespace TxFileManager.Tests
 
         public FileManagerTest()
         {
-            _target = new TxFileManager();
+            _target = new FileManager();
             _numTempFiles = Directory.GetFiles(Path.Combine(Path.GetTempPath(), "CdFileMgr")).Length;
         }
 
@@ -506,7 +507,7 @@ namespace TxFileManager.Tests
                     {
                         _target.Copy(f1, f2, false);
                     }
-                    catch (System.IO.IOException)
+                    catch (IOException)
                     {
                         // Ignore IOException
                     }

@@ -1,7 +1,6 @@
 ﻿using System.IO;
-using TxFileManager.Utils;
 
-namespace TxFileManager.Operations
+namespace TransactionalFileManager.Operations
 {
     /// <summary>
     /// Rollbackable operation which copies a file.

@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TxFileManager
+namespace TransactionalFileManager
 {
     /// <summary>
     /// Classes implementing this interface provide methods to manipulate files.

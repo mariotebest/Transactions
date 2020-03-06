@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ChinhDo.Transactions.FileManager\TxFileManager.csproj" />
+    <ProjectReference Include="..\..\TransactionalFileManager\TransactionalFileManager.csproj" />
   </ItemGroup>
 
 </Project>

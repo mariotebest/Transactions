@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Transactions;
-using TxFileManager.Operations;
+using TransactionalFileManager.Operations;
 
-namespace TxFileManager
+namespace TransactionalFileManager
 {
     /// <summary>Provides two-phase commits/rollbacks/etc for a single <see cref="Transaction"/>.</summary>
     internal sealed class TxEnlistment : IEnlistmentNotification

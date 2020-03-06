@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace TxFileManager.Operations
+namespace TransactionalFileManager.Operations
 {
     /// <summary>
     /// Creates all directories in the specified path.

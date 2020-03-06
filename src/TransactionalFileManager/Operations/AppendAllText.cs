@@ -1,8 +1,7 @@
 ﻿using System.IO;
 using System.Text;
-using TxFileManager.Utils;
 
-namespace TxFileManager.Operations
+namespace TransactionalFileManager.Operations
 {
     /// <summary>
     /// Rollbackable operation which appends a string to an existing file, or creates the file if it doesn't exist.

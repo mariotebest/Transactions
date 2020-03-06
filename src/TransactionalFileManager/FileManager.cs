@@ -5,21 +5,21 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
-using TxFileManager.Operations;
-using TxFileManager.Utils;
+using TransactionalFileManager.Operations;
+using TransactionalFileManager.Utils;
 
-namespace TxFileManager
+namespace TransactionalFileManager
 {
     /// <summary>
     /// File Resource Manager. Allows inclusion of file system operations in transactions.
     /// http://www.chinhdo.com/20080825/transactional-file-manager/
     /// </summary>
-    public class TxFileManager : IFileManager
+    public class FileManager : IFileManager
     {
         /// <summary>
-        /// Initializes the <see cref="TxFileManager"/> class.
+        /// Initializes the <see cref="FileManager"/> class.
         /// </summary>
-        public TxFileManager()
+        public FileManager()
         {
             FileUtils.EnsureTempFolderExists();
         }

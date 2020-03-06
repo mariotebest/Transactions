@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace TxFileManager.Utils
+namespace TransactionalFileManager.Utils
 {
     internal static class FileUtils
     {

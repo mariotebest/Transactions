@@ -1,4 +1,4 @@
-namespace TxFileManager
+namespace TransactionalFileManager
 {
     /// <summary>
     /// Classes implementing this interface provide methods to work with files.

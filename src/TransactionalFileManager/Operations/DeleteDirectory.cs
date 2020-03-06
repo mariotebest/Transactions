@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using TxFileManager.Utils;
+using TransactionalFileManager.Utils;
 
-namespace TxFileManager.Operations
+namespace TransactionalFileManager.Operations
 {
     /// <summary>
     /// Deletes the specified directory and all its contents.

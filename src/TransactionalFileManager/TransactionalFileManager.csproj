@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <Description>A transactional file manager for .netstandard</Description>
     <Company></Company>
     <Product>TxFileManager.net</Product>

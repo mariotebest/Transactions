@@ -1,4 +1,4 @@
-﻿namespace TxFileManager.Operations
+﻿namespace TransactionalFileManager.Operations
 {
     /// <summary>
     /// Represents a transactional file operation.

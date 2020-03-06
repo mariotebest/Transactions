@@ -1,8 +1,7 @@
 ﻿using System.IO;
 using System.Text;
-using TxFileManager.Utils;
 
-namespace TxFileManager.Operations
+namespace TransactionalFileManager.Operations
 {
     /// <summary>
     /// Creates a file, and writes the specified contents to it.
