@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using TxFileManager.Utils;
 
@@ -7,9 +8,9 @@ namespace TxFileManager.Operations
     /// <summary>
     /// Rollbackable operation which appends a string to an existing file, or creates the file if it doesn't exist.
     /// </summary>
-    internal sealed class AppendAllText : SingleFileOperation
+    internal sealed class AppendAllLines : SingleFileOperation
     {
-        private readonly string _contents;
+        private readonly IEnumerable<string> _contents;
         private readonly Encoding _encoding;
 
         /// <summary>
@@ -18,7 +19,7 @@ namespace TxFileManager.Operations
         /// <param name="path">The file to append the string to.</param>
         /// <param name="contents">The string to append to the file.</param>
         /// <param name="encoding">The encoding to use</param>
-        public AppendAllText(string path, string contents, Encoding encoding = null)
+        public AppendAllLines(string path, IEnumerable<string> contents, Encoding encoding)
             : base(path)
         {
             _contents = contents;
@@ -30,7 +31,7 @@ namespace TxFileManager.Operations
         /// </summary>
         /// <param name="path">The file to append the string to.</param>
         /// <param name="contents">The string to append to the file.</param>
-        public AppendAllText(string path, string contents)
+        public AppendAllLines(string path, IEnumerable<string> contents)
             : base(path)
         {
             _contents = contents;
@@ -40,7 +41,7 @@ namespace TxFileManager.Operations
         {
             CreateSnapshot();
 
-            File.AppendAllText(Path, _contents, _encoding);
+            File.AppendAllLines(Path, _contents, _encoding ?? Encoding.Default);
         }
     }
 }

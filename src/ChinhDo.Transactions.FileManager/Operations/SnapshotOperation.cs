@@ -1,12 +1,12 @@
-﻿using ChinhDo.Transactions.Utils;
-using System.IO;
+﻿using System.IO;
+using TxFileManager.Utils;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Rollbackable operation which takes a snapshot of a file. The snapshot is used to rollback the file later if needed.
     /// </summary>
-    sealed class Snapshot: SingleFileOperation
+    internal sealed class Snapshot: SingleFileOperation
     {
         /// <summary>
         /// Instantiates the class.
@@ -18,12 +18,7 @@ namespace ChinhDo.Transactions.FileManager.Operations
 
         public override void Execute()
         {
-            if (File.Exists(path))
-            {
-                string temp = FileUtils.GetTempFileName(Path.GetExtension(path));
-                File.Copy(path, temp);
-                backupPath = temp;
-            }
+            CreateSnapshot();
         }
     }
 }

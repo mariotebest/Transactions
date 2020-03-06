@@ -1,4 +1,4 @@
-namespace ChinhDo.Transactions.FileManager
+namespace TxFileManager
 {
     /// <summary>
     /// Classes implementing this interface provide methods to work with files.
@@ -29,5 +29,17 @@ namespace ChinhDo.Transactions.FileManager
         /// Gets a temporary filename. The file is not automatically created.
         /// </summary>
         string GetTempFileName();
+
+        /// <summary>Deletes the specified directory and all its contents. An exception is not thrown if the directory does not exist.</summary>
+        /// <param name="path">The directory to be deleted.</param>
+        void DeleteDirectory(string path);
+
+        /// <summary>Creates all directories in the specified path.</summary>
+        /// <param name="path">The directory path to create.</param>
+        void CreateDirectory(string path);
+
+        /// <summary>Gets a temporary directory.</summary>
+        /// <returns>The path to the newly created temporary directory.</returns>
+        string GetTempDirectory();
     }
 }

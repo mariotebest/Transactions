@@ -1,15 +1,15 @@
-﻿using ChinhDo.Transactions.Utils;
-using System.IO;
+﻿using System.IO;
+using TxFileManager.Utils;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Rollbackable operation which copies a file.
     /// </summary>
-    sealed class Copy : SingleFileOperation
+    internal sealed class Copy : SingleFileOperation
     {
-        private readonly string sourceFileName;
-        private readonly bool overwrite;
+        private readonly string _sourceFileName;
+        private readonly bool _overwrite;
 
         /// <summary>
         /// Instantiates the class.
@@ -20,20 +20,15 @@ namespace ChinhDo.Transactions.FileManager.Operations
         public Copy(string sourceFileName, string destFileName, bool overwrite)
             : base(destFileName)
         {
-            this.sourceFileName = sourceFileName;
-            this.overwrite = overwrite;
+            _sourceFileName = sourceFileName;
+            _overwrite = overwrite;
         }
 
         public override void Execute()
         {
-            if (File.Exists(path))
-            {
-                string temp = FileUtils.GetTempFileName(Path.GetExtension(path));
-                File.Copy(path, temp);
-                backupPath = temp;
-            }
+            CreateSnapshot();
 
-            File.Copy(sourceFileName, path, overwrite);
+            File.Copy(_sourceFileName, Path, _overwrite);
         }
     }
 }

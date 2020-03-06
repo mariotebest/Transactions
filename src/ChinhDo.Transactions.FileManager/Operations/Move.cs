@@ -1,14 +1,14 @@
 ﻿using System.IO;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Rollbackable operation which moves a file to a new location.
     /// </summary>
-    sealed class Move : IRollbackableOperation
+    internal sealed class Move : IRollbackableOperation
     {
-        private readonly string sourceFileName;
-        private readonly string destFileName;
+        private readonly string _sourceFileName;
+        private readonly string _destFileName;
 
         /// <summary>
         /// Instantiates the class.
@@ -17,18 +17,18 @@ namespace ChinhDo.Transactions.FileManager.Operations
         /// <param name="destFileName">The new path for the file.</param>
         public Move(string sourceFileName, string destFileName)
         {
-            this.sourceFileName = sourceFileName;
-            this.destFileName = destFileName;
+            _sourceFileName = sourceFileName;
+            _destFileName = destFileName;
         }
 
         public void Execute()
         {
-            File.Move(sourceFileName, destFileName);
+            File.Move(_sourceFileName, _destFileName);
         }
 
         public void Rollback()
         {
-            File.Move(destFileName, sourceFileName);
+            File.Move(_destFileName, _sourceFileName);
         }
     }
 }

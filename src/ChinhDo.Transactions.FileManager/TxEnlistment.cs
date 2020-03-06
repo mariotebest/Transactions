@@ -1,12 +1,12 @@
-using ChinhDo.Transactions.FileManager.Operations;
 using System;
 using System.Collections.Generic;
 using System.Transactions;
+using TxFileManager.Operations;
 
-namespace ChinhDo.Transactions.FileManager
+namespace TxFileManager
 {
     /// <summary>Provides two-phase commits/rollbacks/etc for a single <see cref="Transaction"/>.</summary>
-    sealed class TxEnlistment : IEnlistmentNotification
+    internal sealed class TxEnlistment : IEnlistmentNotification
     {
         private readonly List<IRollbackableOperation> _journal = new List<IRollbackableOperation>();
 
@@ -54,7 +54,7 @@ namespace ChinhDo.Transactions.FileManager
             try
             {
                 // Roll back journal items in reverse order
-                for (int i = _journal.Count - 1; i >= 0; i--)
+                for (var i = _journal.Count - 1; i >= 0; i--)
                 {
                     _journal[i].Rollback();
                 }
@@ -72,7 +72,7 @@ namespace ChinhDo.Transactions.FileManager
         private void DisposeJournal()
         {
             IDisposable disposable;
-            for (int i = _journal.Count - 1; i >= 0; i--)
+            for (var i = _journal.Count - 1; i >= 0; i--)
             {
                 disposable = _journal[i] as IDisposable;
                 if (disposable != null)

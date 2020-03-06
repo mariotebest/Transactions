@@ -1,14 +1,16 @@
-﻿using ChinhDo.Transactions.Utils;
-using System.IO;
+﻿using System.IO;
+using System.Text;
+using TxFileManager.Utils;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Creates a file, and writes the specified contents to it.
     /// </summary>
-    sealed class WriteAllText : SingleFileOperation
+    internal sealed class WriteAllText : SingleFileOperation
     {
-        private readonly string contents;
+        private readonly string _contents;
+        private readonly Encoding _encoding;
 
         /// <summary>
         /// Instantiates the class.
@@ -18,19 +20,25 @@ namespace ChinhDo.Transactions.FileManager.Operations
         public WriteAllText(string path, string contents)
             : base(path)
         {
-            this.contents = contents;
+            _contents = contents;
+        }
+
+        /// <summary>
+        /// Instantiates the class.
+        /// </summary>
+        /// <param name="path">The file to write to.</param>
+        /// <param name="contents">The string to write to the file.</param>
+        public WriteAllText(string path, string contents, Encoding encoding)
+            : base(path)
+        {
+            _contents = contents;
+            _encoding = encoding;
         }
 
         public override void Execute()
         {
-            if (File.Exists(path))
-            {
-                string temp = FileUtils.GetTempFileName(Path.GetExtension(path));
-                File.Copy(path, temp);
-                backupPath = temp;
-            }
-
-            File.WriteAllText(path, contents);
+            CreateSnapshot();
+            File.WriteAllText(Path, _contents, _encoding ?? Encoding.Default);
         }
     }
 }

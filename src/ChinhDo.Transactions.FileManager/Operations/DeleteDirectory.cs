@@ -1,18 +1,18 @@
-﻿using ChinhDo.Transactions.Utils;
-using System;
+﻿using System;
 using System.IO;
+using TxFileManager.Utils;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Deletes the specified directory and all its contents.
     /// </summary>
-    sealed class DeleteDirectory : IRollbackableOperation, IDisposable
+    internal sealed class DeleteDirectory : IRollbackableOperation, IDisposable
     {
-        private readonly string path;
-        private string backupPath;
+        private readonly string _path;
+        private string _backupPath;
         // tracks whether Dispose has been called
-        private bool disposed;
+        private bool _disposed;
 
         /// <summary>
         /// Instantiates the class.
@@ -20,7 +20,7 @@ namespace ChinhDo.Transactions.FileManager.Operations
         /// <param name="path">The directory path to delete.</param>
         public DeleteDirectory(string path)
         {
-            this.path = path;
+            _path = path;
         }
 
         /// <summary>
@@ -33,25 +33,23 @@ namespace ChinhDo.Transactions.FileManager.Operations
 
         public void Execute()
         {
-            if (Directory.Exists(path))
-            {
-                string temp = FileUtils.GetTempFileName(String.Empty);
-                MoveDirectory(path, temp);
-                backupPath = temp;
-            }
+            if (!Directory.Exists(_path)) return;
+
+            var temp = FileUtils.GetTempFileName(string.Empty);
+            MoveDirectory(_path, temp);
+            _backupPath = temp;
         }
 
         public void Rollback()
         {
-            if (Directory.Exists(backupPath))
+            if (!Directory.Exists(_backupPath)) return;
+
+            var parentDirectory = Path.GetDirectoryName(_path);
+            if (!Directory.Exists(parentDirectory))
             {
-                string parentDirectory = Path.GetDirectoryName(path);
-                if (!Directory.Exists(parentDirectory))
-                {
-                    Directory.CreateDirectory(parentDirectory);
-                }
-                MoveDirectory(backupPath, path);
+                Directory.CreateDirectory(parentDirectory);
             }
+            MoveDirectory(_backupPath, _path);
         }
 
         /// <summary>
@@ -89,14 +87,14 @@ namespace ChinhDo.Transactions.FileManager.Operations
                 destinationDirectory.Create();
             }
 
-            foreach (FileInfo sourceFile in sourceDirectory.GetFiles())
+            foreach (var sourceFile in sourceDirectory.GetFiles())
             {
                 sourceFile.CopyTo(Path.Combine(destinationDirectory.FullName, sourceFile.Name));
             }
 
-            foreach (DirectoryInfo sourceSubDirectory in sourceDirectory.GetDirectories())
+            foreach (var sourceSubDirectory in sourceDirectory.GetDirectories())
             {
-                string destinationSubDirectoryPath = Path.Combine(destinationDirectory.FullName, sourceSubDirectory.Name);
+                var destinationSubDirectoryPath = Path.Combine(destinationDirectory.FullName, sourceSubDirectory.Name);
                 CopyDirectory(sourceSubDirectory, new DirectoryInfo(destinationSubDirectoryPath));
             }
         }
@@ -106,15 +104,14 @@ namespace ChinhDo.Transactions.FileManager.Operations
         /// </summary>
         private void InnerDispose()
         {
-            if (!disposed)
-            {
-                if (Directory.Exists(backupPath))
-                {
-                    Directory.Delete(backupPath, true);
-                }
+            if (_disposed) return;
 
-                disposed = true;
+            if (Directory.Exists(_backupPath))
+            {
+                Directory.Delete(_backupPath, true);
             }
+
+            _disposed = true;
         }
     }
 }

@@ -1,14 +1,14 @@
-﻿using ChinhDo.Transactions.Utils;
-using System.IO;
+﻿using System.IO;
+using TxFileManager.Utils;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Creates a file, and writes the specified contents to it.
     /// </summary>
-    sealed class WriteAllBytes : SingleFileOperation
+    internal sealed class WriteAllBytes : SingleFileOperation
     {
-        private readonly byte[] contents;
+        private readonly byte[] _contents;
 
         /// <summary>
         /// Instantiates the class.
@@ -18,19 +18,14 @@ namespace ChinhDo.Transactions.FileManager.Operations
         public WriteAllBytes(string path, byte[] contents)
             : base(path)
         {
-            this.contents = contents;
+            _contents = contents;
         }
 
         public override void Execute()
         {
-            if (File.Exists(path))
-            {
-                string temp = FileUtils.GetTempFileName(Path.GetExtension(path));
-                File.Copy(path, temp);
-                backupPath = temp;
-            }
+            CreateSnapshot();
 
-            File.WriteAllBytes(path, contents);
+            File.WriteAllBytes(Path, _contents);
         }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System.IO;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Creates all directories in the specified path.
     /// </summary>
-    sealed class CreateDirectory : IRollbackableOperation
+    internal sealed class CreateDirectory : IRollbackableOperation
     {
-        private readonly string path;
-        private string backupPath;
+        private readonly string _path;
+        private string _backupPath;
 
         /// <summary>
         /// Instantiates the class.
@@ -16,14 +16,14 @@ namespace ChinhDo.Transactions.FileManager.Operations
         /// <param name="path">The directory path to create.</param>
         public CreateDirectory(string path)
         {
-            this.path = path;
+            _path = path;
         }
 
         public void Execute()
         {
             // find the topmost directory which must be created
-            string children = Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            string parent = Path.GetDirectoryName(children);
+            var children = Path.GetFullPath(_path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var parent = Path.GetDirectoryName(children);
             while (parent != null /* children is a root directory */
                 && !Directory.Exists(parent))
             {
@@ -31,23 +31,17 @@ namespace ChinhDo.Transactions.FileManager.Operations
                 parent = Path.GetDirectoryName(children);
             }
 
-            if (Directory.Exists(children))
-            {
-                // nothing to do
-                return;
-            }
-            else
-            {
-                Directory.CreateDirectory(path);
-                backupPath = children;
-            }
+            if (Directory.Exists(children)) return;
+
+            Directory.CreateDirectory(_path);
+            _backupPath = children;
         }
 
         public void Rollback()
         {
-            if (backupPath != null)
+            if (_backupPath != null)
             {
-                Directory.Delete(backupPath, true);
+                Directory.Delete(_backupPath, true);
             }
         }
     }

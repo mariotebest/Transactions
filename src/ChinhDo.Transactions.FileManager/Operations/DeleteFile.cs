@@ -1,12 +1,12 @@
-﻿using ChinhDo.Transactions.Utils;
-using System.IO;
+﻿using System.IO;
+using TxFileManager.Utils;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Rollbackable operation which deletes a file. An exception is not thrown if the file does not exist.
     /// </summary>
-    sealed class DeleteFile : SingleFileOperation
+    internal sealed class DeleteFile : SingleFileOperation
     {
         /// <summary>
         /// Instantiates the class.
@@ -19,14 +19,9 @@ namespace ChinhDo.Transactions.FileManager.Operations
 
         public override void Execute()
         {
-            if (File.Exists(path))
-            {
-                string temp = FileUtils.GetTempFileName(Path.GetExtension(path));
-                File.Copy(path, temp);
-                backupPath = temp;
-            }
+            CreateSnapshot();
 
-            File.Delete(path);
+            File.Delete(Path);
         }
     }
 }

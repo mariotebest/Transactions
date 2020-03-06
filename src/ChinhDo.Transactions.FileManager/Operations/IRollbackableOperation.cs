@@ -1,9 +1,9 @@
-﻿namespace ChinhDo.Transactions.FileManager.Operations
+﻿namespace TxFileManager.Operations
 {
     /// <summary>
     /// Represents a transactional file operation.
     /// </summary>
-    interface IRollbackableOperation
+    internal interface IRollbackableOperation
     {
         /// <summary>
         /// Executes the operation.

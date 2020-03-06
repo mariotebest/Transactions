@@ -1,11 +1,14 @@
-using ChinhDo.Transactions.FileManager.Operations;
-using ChinhDo.Transactions.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Transactions;
+using TxFileManager.Operations;
+using TxFileManager.Utils;
 
-namespace ChinhDo.Transactions.FileManager
+namespace TxFileManager
 {
     /// <summary>
     /// File Resource Manager. Allows inclusion of file system operations in transactions.
@@ -23,15 +26,62 @@ namespace ChinhDo.Transactions.FileManager
 
         #region IFileOperations
 
+        public void AppendAllLines(string path, IEnumerable<string> contents)
+        {
+            if (IsInTransaction())
+                EnlistOperation(new AppendAllLines(path, contents));
+            else
+                File.AppendAllLines(path, contents);
+        }
+
+        public void AppendAllLines(string path, IEnumerable<string> contents, Encoding encoding)
+        {
+            if (IsInTransaction())
+                EnlistOperation(new AppendAllLines(path, contents, encoding));
+            else
+                File.AppendAllLines(path, contents, encoding);
+        }
+
+        public async Task AppendAllLinesAsync(string path, IEnumerable<string> contents, Encoding encoding,
+            CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => AppendAllLines(path, contents, encoding), cancellationToken);
+        }
+
+        public async Task AppendAllLinesAsync(string path, IEnumerable<string> contents, CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => AppendAllLines(path, contents), cancellationToken);
+        }
+
         /// <summary>Appends the specified string the file, creating the file if it doesn't already exist.</summary>
         /// <param name="path">The file to append the string to.</param>
         /// <param name="contents">The string to append to the file.</param>
         public void AppendAllText(string path, string contents)
         {
+            AppendAllText(path, contents, null);
+        }
+
+        public void AppendAllText(string path, string contents, Encoding encoding)
+        {
             if (IsInTransaction())
-                EnlistOperation(new AppendAllText(path, contents));
+                EnlistOperation(new AppendAllText(path, contents, encoding));
             else
-                File.AppendAllText(path, contents);
+                File.AppendAllText(path, contents, encoding);
+        }
+
+        public async Task AppendAllTextAsync(string path, string contents, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => AppendAllText(path, contents, encoding), cancellationToken);
+        }
+
+        public async Task AppendAllTextAsync(string path, string contents, CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => AppendAllText(path, contents), cancellationToken);
+        }
+
+        public void Copy(string sourceFileName, string destFileName)
+        {
+            Copy(sourceFileName, destFileName, false);
         }
 
         /// <summary>Copies the specified <paramref name="sourceFileName"/> to <paramref name="destFileName"/>.</summary>
@@ -66,6 +116,7 @@ namespace ChinhDo.Transactions.FileManager
                 File.Delete(path);
         }
 
+
         /// <summary>Deletes the specified directory and all its contents. An exception is not thrown if the directory does not exist.</summary>
         /// <param name="path">The directory to be deleted.</param>
         public void DeleteDirectory(string path)
@@ -77,15 +128,38 @@ namespace ChinhDo.Transactions.FileManager
         }
 
         /// <summary>Moves the specified file to a new location.</summary>
-        /// <param name="srcFileName">The name of the file to move.</param>
+        /// <param name="sourceFileName">The name of the file to move.</param>
         /// <param name="destFileName">The new path for the file.</param>
-        public void Move(string srcFileName, string destFileName)
+        public void Move(string sourceFileName, string destFileName)
+        {
+            Move(sourceFileName, destFileName, false);
+        }
+
+        public void Move(string sourceFileName, string destFileName, bool overwrite)
+        {
+            if (!overwrite && File.Exists(destFileName)) throw new InvalidOperationException("Cannot move file. File exists!");
+            if (IsInTransaction())
+                EnlistOperation(new Move(sourceFileName, destFileName));
+            else
+                File.Move(sourceFileName, destFileName);
+        }
+
+
+        public void Replace(string sourceFileName, string destinationFileName, string destinationBackupFileName)
+        {
+            Replace(sourceFileName, destinationFileName, destinationBackupFileName, false);
+        }
+
+        public void Replace(string sourceFileName, string destinationFileName, string destinationBackupFileName,
+            bool ignoreMetadataErrors)
         {
             if (IsInTransaction())
-                EnlistOperation(new Move(srcFileName, destFileName));
+                EnlistOperation(new Replace(sourceFileName, destinationFileName, destinationBackupFileName,
+                    ignoreMetadataErrors));
             else
-                File.Move(srcFileName, destFileName);
+                File.Replace(sourceFileName, destinationFileName, destinationBackupFileName, ignoreMetadataErrors);
         }
+
 
         /// <summary>Take a snapshot of the specified file. The snapshot is used to rollback the file later if needed.</summary>
         /// <param name="fileName">The file to take a snapshot for.</param>
@@ -93,6 +167,11 @@ namespace ChinhDo.Transactions.FileManager
         {
             if (IsInTransaction())
                 EnlistOperation(new Snapshot(fileName));
+        }
+
+        public async Task WriteAllLinesAsync(string path, IEnumerable<string> contents, CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => WriteAllLines(path, contents), cancellationToken);
         }
 
         /// <summary>Creates a file, write the specified <paramref name="contents"/> to the file.</summary>
@@ -106,15 +185,80 @@ namespace ChinhDo.Transactions.FileManager
                 File.WriteAllText(path, contents);
         }
 
+        public void WriteAllText(string path, string contents, Encoding encoding)
+        {
+            if (IsInTransaction())
+                EnlistOperation(new WriteAllText(path, contents));
+            else
+                File.WriteAllText(path, contents, encoding);
+        }
+
+        public async Task WriteAllTextAsync(string path, string contents, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => WriteAllText(path, contents, encoding), cancellationToken);
+        }
+
+        public async Task WriteAllTextAsync(string path, string contents, CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => WriteAllText(path, contents), cancellationToken);
+        }
+
         /// <summary>Creates a file, write the specified <paramref name="contents"/> to the file.</summary>
         /// <param name="path">The file to write to.</param>
         /// <param name="contents">The bytes to write to the file.</param>
         public void WriteAllBytes(string path, byte[] contents)
         {
             if (IsInTransaction())
+            {
                 EnlistOperation(new WriteAllBytes(path, contents));
+            }
             else
+            {
                 File.WriteAllBytes(path, contents);
+            }
+        }
+
+        public async Task WriteAllBytesAsync(string path, byte[] bytes, CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => WriteAllBytes(path, bytes), cancellationToken);
+        }
+
+        public void WriteAllLines(string path, IEnumerable<string> contents)
+        {
+            if (IsInTransaction())
+                EnlistOperation(new WriteAllLines(path, contents));
+            else
+                File.WriteAllLines(path, contents);
+        }
+
+        public void WriteAllLines(string path, IEnumerable<string> contents, Encoding encoding)
+        {
+            if (IsInTransaction())
+                EnlistOperation(new WriteAllLines(path, contents, encoding));
+            else
+                File.WriteAllLines(path, contents, encoding);
+        }
+
+        public void WriteAllLines(string path, string[] contents)
+        {
+            if (IsInTransaction())
+                EnlistOperation(new WriteAllLines(path, contents));
+            else
+                File.WriteAllLines(path, contents);
+        }
+
+        public void WriteAllLines(string path, string[] contents, Encoding encoding)
+        {
+            if (IsInTransaction())
+                EnlistOperation(new WriteAllLines(path, contents, encoding));
+            else
+                File.WriteAllLines(path, contents, encoding);
+        }
+
+        public async Task WriteAllLinesAsync(string path, IEnumerable<string> contents, Encoding encoding,
+            CancellationToken cancellationToken = default)
+        {
+            await Task.Run(() => WriteAllLines(path, contents, encoding), cancellationToken);
         }
 
         #endregion
@@ -141,23 +285,19 @@ namespace ChinhDo.Transactions.FileManager
         /// <param name="recursive">if set to <c>true</c>, include files in sub directories recursively.</param>
         public void GetFiles(string path, FileEventHandler handler, bool recursive)
         {
-            foreach (string fileName in Directory.GetFiles(path))
+            foreach (var fileName in Directory.GetFiles(path))
             {
-                bool cancel = false;
+                var cancel = false;
                 handler(fileName, ref cancel);
-                if (cancel)
-                {
-                    return;
-                }
+                if (cancel) return;
             }
 
             // Check subdirs
-            if (recursive)
+            if (!recursive) return;
+
+            foreach (var folderName in Directory.GetDirectories(path))
             {
-                foreach (string folderName in Directory.GetDirectories(path))
-                {
-                    GetFiles(folderName, handler, recursive);
-                }
+                GetFiles(folderName, handler, true);
             }
         }
 
@@ -165,7 +305,7 @@ namespace ChinhDo.Transactions.FileManager
         /// <param name="extension">File extension (with the dot).</param>
         public string GetTempFileName(string extension)
         {
-            string retVal = FileUtils.GetTempFileName(extension);
+            var retVal = FileUtils.GetTempFileName(extension);
 
             Snapshot(retVal);
 
@@ -191,8 +331,8 @@ namespace ChinhDo.Transactions.FileManager
         /// <returns>Path to the temporary directory. The temporary directory is created automatically.</returns>
         public string GetTempDirectory(string parentDirectory, string prefix)
         {
-            Guid g = Guid.NewGuid();
-            string dirName = Path.Combine(parentDirectory, prefix + g.ToString().Substring(0, 16));
+            var g = Guid.NewGuid();
+            var dirName = Path.Combine(parentDirectory, prefix + g.ToString().Substring(0, 16));
 
             CreateDirectory(dirName);
 
@@ -205,7 +345,7 @@ namespace ChinhDo.Transactions.FileManager
         [ThreadStatic]
         private static Dictionary<string, TxEnlistment> _enlistments;
 
-        private static readonly object _enlistmentsLock = new object();
+        private static readonly object EnlistmentsLock = new object();
 
         private static bool IsInTransaction()
         {
@@ -214,17 +354,16 @@ namespace ChinhDo.Transactions.FileManager
 
         private static void EnlistOperation(IRollbackableOperation operation)
         {
-            Transaction tx = Transaction.Current;
-            TxEnlistment enlistment;
+            var tx = Transaction.Current;
 
-            lock (_enlistmentsLock)
+            lock (EnlistmentsLock)
             {
                 if (_enlistments == null)
                 {
                     _enlistments = new Dictionary<string, TxEnlistment>();
                 }
 
-                if (!_enlistments.TryGetValue(tx.TransactionInformation.LocalIdentifier, out enlistment))
+                if (!_enlistments.TryGetValue(tx.TransactionInformation.LocalIdentifier, out var enlistment))
                 {
                     enlistment = new TxEnlistment(tx);
                     _enlistments.Add(tx.TransactionInformation.LocalIdentifier, enlistment);

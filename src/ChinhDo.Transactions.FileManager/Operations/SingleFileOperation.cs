@@ -1,22 +1,32 @@
 ﻿using System;
 using System.IO;
+using TxFileManager.Utils;
 
-namespace ChinhDo.Transactions.FileManager.Operations
+namespace TxFileManager.Operations
 {
     /// <summary>
     /// Class that contains common code for those rollbackable file operations which need
     /// to backup a single file and restore it when Rollback() is called.
     /// </summary>
-    abstract class SingleFileOperation : IRollbackableOperation, IDisposable
+    internal abstract class SingleFileOperation : IRollbackableOperation, IDisposable
     {
-        protected readonly string path;
-        protected string backupPath;
+        protected readonly string Path;
+        protected string BackupPath;
         // tracks whether Dispose has been called
-        private bool disposed;
+        private bool _disposed;
 
-        public SingleFileOperation(string path)
+        protected SingleFileOperation(string path)
         {
-            this.path = path;
+            Path = path;
+        }
+
+        protected void CreateSnapshot()
+        {
+            if (!File.Exists(Path)) return;
+
+            var temp = FileUtils.GetTempFileName(System.IO.Path.GetExtension(Path));
+            File.Copy(Path, temp);
+            BackupPath = temp;
         }
 
         /// <summary>
@@ -31,20 +41,20 @@ namespace ChinhDo.Transactions.FileManager.Operations
 
         public void Rollback()
         {
-            if (backupPath != null)
+            if (BackupPath != null)
             {
-                string directory = Path.GetDirectoryName(path);
+                var directory = System.IO.Path.GetDirectoryName(Path);
                 if (!Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }
-                File.Copy(backupPath, path, true);
+                File.Copy(BackupPath, Path, true);
             }
             else
             {
-                if (File.Exists(path))
+                if (File.Exists(Path))
                 {
-                    File.Delete(path);
+                    File.Delete(Path);
                 }
             }
         }
@@ -63,20 +73,19 @@ namespace ChinhDo.Transactions.FileManager.Operations
         /// </summary>
         private void InnerDispose()
         {
-            if (!disposed)
-            {
-                if (backupPath != null)
-                {
-                    FileInfo fi = new FileInfo(backupPath);
-                    if (fi.IsReadOnly)
-                    {
-                        fi.Attributes = FileAttributes.Normal;
-                    }
-                    File.Delete(backupPath);
-                }
+            if (_disposed) return;
 
-                disposed = true;
+            if (BackupPath != null)
+            {
+                var fi = new FileInfo(BackupPath);
+                if (fi.IsReadOnly)
+                {
+                    fi.Attributes = FileAttributes.Normal;
+                }
+                File.Delete(BackupPath);
             }
+
+            _disposed = true;
         }
     }
 }
