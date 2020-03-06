@@ -41,5 +41,9 @@ namespace TxFileManager
         /// <summary>Gets a temporary directory.</summary>
         /// <returns>The path to the newly created temporary directory.</returns>
         string GetTempDirectory();
+
+        /// <summary>Take a snapshot of the specified file. The snapshot is used to rollback the file later if needed.</summary>
+        /// <param name="fileName">The file to take a snapshot for.</param>
+        void Snapshot(string fileName);
     }
 }

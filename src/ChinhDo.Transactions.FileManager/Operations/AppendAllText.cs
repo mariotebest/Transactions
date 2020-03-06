@@ -18,7 +18,7 @@ namespace TxFileManager.Operations
         /// <param name="path">The file to append the string to.</param>
         /// <param name="contents">The string to append to the file.</param>
         /// <param name="encoding">The encoding to use</param>
-        public AppendAllText(string path, string contents, Encoding encoding = null)
+        public AppendAllText(string path, string contents, Encoding encoding)
             : base(path)
         {
             _contents = contents;
@@ -40,7 +40,7 @@ namespace TxFileManager.Operations
         {
             CreateSnapshot();
 
-            File.AppendAllText(Path, _contents, _encoding);
+            File.AppendAllText(Path, _contents, _encoding ?? Encoding.Default);
         }
     }
 }

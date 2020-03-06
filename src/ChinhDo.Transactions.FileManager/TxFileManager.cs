@@ -58,7 +58,10 @@ namespace TxFileManager
         /// <param name="contents">The string to append to the file.</param>
         public void AppendAllText(string path, string contents)
         {
-            AppendAllText(path, contents, null);
+            if (IsInTransaction())
+                EnlistOperation(new AppendAllText(path, contents));
+            else
+                File.AppendAllText(path, contents);
         }
 
         public void AppendAllText(string path, string contents, Encoding encoding)
