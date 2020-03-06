@@ -60,4 +60,4 @@ $revision = "{0:D4}" -f [convert]::ToInt32($revision, 10)
 
 # exec { & dotnet test -c Release }
 
-exec { & dotnet pack .\src\ChinhDo.Transactions.FileManager\TxFileManager.csproj -c Release -o .\artifacts --version-suffix=$revision }
+exec { & dotnet pack .\ChinhDo.Transactions.FileManager -c Release -o .\artifacts --version-suffix=$revision }
